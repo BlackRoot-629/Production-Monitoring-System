@@ -1,4 +1,4 @@
-# Production Monitoring System
+# Real-Time Production Monitoring System using FastAPI, PostgreSQL and Docker
 
 ## Overview
 
@@ -137,6 +137,84 @@ Line 6
 * Mobile Responsive Dashboard
 
 ---
+
+## Getting Started
+
+1. Create Virtual Environment
+python -m venv venv
+
+Activate virtual environment:
+
+Windows:
+
+venv\Scripts\activate
+
+Linux / macOS:
+
+source venv/bin/activate
+2. Install Required Packages
+pip install -r requirements.txt
+3. Start PostgreSQL Database
+
+Using Docker:
+
+docker run -d \
+--name production-db \
+-e POSTGRES_PASSWORD=123456 \
+-e POSTGRES_DB=production \
+-p 5432:5432 \
+postgres
+4. Configure Database Connection
+
+Open:
+
+database.py
+
+Update database connection string if needed.
+
+Example:
+
+DATABASE_URL = "postgresql://postgres:123456@localhost:5432/production"
+5. Start Application
+uvicorn app:app --reload
+6. Open Application
+
+Login Page:
+
+http://127.0.0.1:8000
+
+Swagger Documentation:
+
+http://127.0.0.1:8000/docs
+
+Factory Dashboard:
+
+http://127.0.0.1:8000/dashboard
+
+Order Code Management:
+
+http://127.0.0.1:8000/ordercode
+
+Production Monitor:
+
+http://127.0.0.1:8000/monitor/1
+
+## Initial Setup
+Before using the system:
+
+1. Start PostgreSQL database.
+2. Start FastAPI application.
+3. Open Order Code Management page.
+4. Register Order Codes and Product Types.
+5. Create user accounts.
+6. Open production line page.
+7. Start serial registration.
+
+Important:
+
+Order Codes must be registered before serial scanning. Otherwise the system will return:
+
+Order Code Not Found
 
 ## Author
 
