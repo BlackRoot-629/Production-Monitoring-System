@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fa">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Factory Dashboard</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+body{
+
+    margin:20px;
+
+    background:#0f172a;
+
+    color:white;
+
+    font-family:Tahoma;
+
+}
+
+h1{
+
+    text-align:center;
+
+    font-size:50px;
+
+    margin-bottom:30px;
+
+}
+
+#clock{
+
+    text-align:center;
+
+    font-size:24px;
+
+    margin-bottom:30px;
+
+    color:#cbd5e1;
+
+}
+
+.grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:20px;
+
+}
+
+.card{
+
+    border-radius:25px;
+
+    padding:25px;
+
+    text-align:center;
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.5);
+
+    transition:.3s;
+
+}
+
+.card:hover{
+
+    transform:translateY(-5px);
+
+}
+
+.lineTitle{
+
+    font-size:30px;
+
+    margin-bottom:15px;
+
+    font-weight:bold;
+
+}
+
+.value{
+
+    font-size:50px;
+
+    font-weight:bold;
+
+    margin-bottom:10px;
+
+}
+
+.expected{
+
+    font-size:22px;
+
+    margin-bottom:10px;
+
+}
+
+.diff{
+
+    font-size:28px;
+
+    font-weight:bold;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>
+
+Factory Dashboard
+
+</h1>
+
+<div id="clock"></div>
+
+<div
+    class="grid"
+    id="dashboard"
+>
+
+</div>
+
+<script>
+
+function updateClock(){
+
+    const now = new Date();
+
+    document.getElementById(
+        "clock"
+    ).innerText =
+
+        now.toLocaleDateString("fa-IR")
+        +
+        " | "
+        +
+        now.toLocaleTimeString("fa-IR");
+
+}
+
+updateClock();
+
+setInterval(
+    updateClock,
+    1000
+);
+
+async function loadDashboard(){
+
+    const response =
+        await fetch(
+            "/api/dashboard"
+        );
+
+    const data =
+        await response.json();
+
+    const dashboard =
+        document.getElementById(
+            "dashboard"
+        );
+
+    dashboard.innerHTML = "";
+
+    data.forEach(line => {
+
+        let bgColor = "";
+
+        if(line.difference > 0){
+
+            bgColor =
+                "linear-gradient(145deg,#16a34a,#15803d)";
+
+        }
+        else if(line.difference < 0){
+
+            bgColor =
+                "linear-gradient(145deg,#dc2626,#991b1b)";
+
+        }
+        else{
+
+            bgColor =
+                "linear-gradient(145deg,#2563eb,#1d4ed8)";
+
+        }
+
+        dashboard.innerHTML += `
+
+            <div
+                class="card"
+                style="
+                    background:${bgColor}
+                "
+            >
+
+                <div class="lineTitle">
+
+                    Line ${line.line_id}
+
+                </div>
+
+                <div class="value">
+
+                    ${line.actual}
+
+                </div>
+
+                <div
+                    style="
+                        font-size:24px;
+                        margin-bottom:10px;
+                    "
+                >
+
+                    AIO EQ :
+                    ${line.aio_equivalent}
+
+                </div>
+
+                <div class="expected">
+
+                    Target :
+                    ${line.expected}
+
+                </div>
+
+                <div class="diff">
+
+                    Diff :
+                    ${line.difference}
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+loadDashboard();
+
+setInterval(
+    loadDashboard,
+    5000
+);
+
+</script>
+
+</body>
+
+</html>

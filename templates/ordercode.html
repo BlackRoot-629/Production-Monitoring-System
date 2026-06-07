@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fa">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Order Code Management</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+body{
+
+    margin:0;
+
+    height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:#0f172a;
+
+    font-family:Tahoma;
+
+    color:white;
+
+}
+
+.container{
+
+    width:700px;
+
+    background:linear-gradient(
+        145deg,
+        #2c2c2c,
+        #1a1a1a
+    );
+
+    padding:40px;
+
+    border-radius:30px;
+
+    box-shadow:
+        0 15px 30px rgba(0,0,0,.6);
+
+}
+
+h1{
+
+    text-align:center;
+
+    margin-bottom:30px;
+
+}
+
+input,select{
+
+    width:100%;
+
+    box-sizing:border-box;
+
+    padding:15px;
+
+    margin-bottom:20px;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-size:20px;
+
+}
+
+button{
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-size:20px;
+
+    cursor:pointer;
+
+}
+
+#message{
+
+    text-align:center;
+
+    margin-top:20px;
+
+    font-size:22px;
+
+    font-weight:bold;
+
+}
+
+.success{
+
+    color:#22c55e;
+
+}
+
+.error{
+
+    color:#ef4444;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>
+
+        Order Code Management
+
+    </h1>
+
+    <input
+        id="orderCode"
+        placeholder="Order Code"
+    >
+
+    <select id="productType">
+
+        <option value="AIO">
+
+            AIO
+
+        </option>
+
+        <option value="MNT">
+
+            MNT
+
+        </option>
+
+        <option value="CASE">
+
+            CASE
+
+        </option>
+
+        <option value="NB">
+
+            NB
+
+        </option>
+
+    </select>
+
+    <button onclick="saveOrderCode()">
+
+        Save
+
+    </button>
+
+    <div id="message"></div>
+
+</div>
+
+<script>
+
+async function saveOrderCode(){
+
+    const orderCode =
+        document.getElementById(
+            "orderCode"
+        ).value.trim();
+
+    const productType =
+        document.getElementById(
+            "productType"
+        ).value;
+
+    const response =
+        await fetch(
+
+            "/api/ordercode",
+
+            {
+
+                method:"POST",
+
+                headers:{
+
+                    "Content-Type":
+                    "application/json"
+
+                },
+
+                body:JSON.stringify({
+
+                    order_code:
+                        orderCode,
+
+                    product_type:
+                        productType
+
+                })
+
+            }
+
+        );
+
+    const result =
+        await response.json();
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+    if(result.message){
+
+        message.className =
+            "success";
+
+        message.innerText =
+            "✓ Saved";
+
+        document.getElementById(
+            "orderCode"
+        ).value = "";
+
+    }
+    else{
+
+        message.className =
+            "error";
+
+        message.innerText =
+            result.error;
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>

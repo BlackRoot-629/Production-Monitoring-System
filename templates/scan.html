@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+
+<html lang="fa">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Production Entry</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+body{
+
+    margin:0;
+
+    height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:#0f172a;
+
+    font-family:Tahoma;
+
+    color:white;
+
+}
+
+.container{
+
+    width:700px;
+
+    background:linear-gradient(
+        145deg,
+        #2c2c2c,
+        #1a1a1a
+    );
+
+    padding:40px;
+
+    border-radius:30px;
+
+    box-shadow:
+        0 15px 30px rgba(0,0,0,.6);
+
+}
+
+h1{
+
+    text-align:center;
+
+    font-size:42px;
+
+    margin-bottom:15px;
+
+}
+
+#clock{
+
+    text-align:center;
+
+    font-size:22px;
+
+    margin-bottom:15px;
+
+    color:#cbd5e1;
+
+}
+
+#lastSerial{
+
+    text-align:center;
+
+    font-size:22px;
+
+    margin-bottom:20px;
+
+    color:#38bdf8;
+
+}
+
+.stats{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-bottom:25px;
+
+}
+
+.statBox{
+
+    flex:1;
+
+    background:#334155;
+
+    border-radius:15px;
+
+    padding:15px;
+
+    text-align:center;
+
+}
+
+.statTitle{
+
+    font-size:18px;
+
+    margin-bottom:10px;
+
+}
+
+.statValue{
+
+    font-size:30px;
+
+    font-weight:bold;
+
+}
+
+label{
+
+    display:block;
+
+    font-size:22px;
+
+    margin-bottom:10px;
+
+}
+
+input{
+
+    width:100%;
+
+    box-sizing:border-box;
+
+    padding:20px;
+
+    margin-bottom:25px;
+
+    border:none;
+
+    border-radius:15px;
+
+    font-size:28px;
+
+    outline:none;
+
+    background:#f8fafc;
+
+}
+
+input:focus{
+
+    box-shadow:
+        0 0 15px #2563eb;
+
+}
+
+#message{
+
+    text-align:center;
+
+    font-size:30px;
+
+    font-weight:bold;
+
+    min-height:50px;
+
+    margin-top:20px;
+
+}
+
+.success{
+
+    color:#22c55e;
+
+}
+
+.error{
+
+    color:#ef4444;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>
+
+    Production Line {{ line_id }}
+
+</h1>
+
+<div id="clock"></div>
+
+<div id="lastSerial">
+
+    Last Serial : -
+
+</div>
+
+<div class="stats">
+
+    <div class="statBox">
+
+        <div class="statTitle">AIO</div>
+
+        <div class="statValue" id="aioCount">0</div>
+
+    </div>
+
+    <div class="statBox">
+
+        <div class="statTitle">MNT</div>
+
+        <div class="statValue" id="mntCount">0</div>
+
+    </div>
+
+    <div class="statBox">
+
+        <div class="statTitle">CASE</div>
+
+        <div class="statValue" id="caseCount">0</div>
+
+    </div>
+
+    <div class="statBox">
+
+        <div class="statTitle">NB</div>
+
+        <div class="statValue" id="nbCount">0</div>
+
+    </div>
+
+</div>
+
+<label>
+
+    Order Number
+
+</label>
+
+<input
+    id="orderNumber"
+    placeholder="Scan Order Number"
+    autofocus
+>
+
+<label>
+
+    Serial Number
+
+</label>
+
+<input
+    id="serialNumber"
+    placeholder="Scan Serial Number"
+>
+
+<div id="message"></div>
+
+
+</div>
+
+<script>
+
+const orderInput =
+    document.getElementById("orderNumber");
+
+const serialInput =
+    document.getElementById("serialNumber");
+
+const message =
+    document.getElementById("message");
+
+function updateClock(){
+
+    const now = new Date();
+
+    document.getElementById(
+        "clock"
+    ).innerText =
+
+        now.toLocaleDateString("fa-IR")
+        +
+        " | "
+        +
+        now.toLocaleTimeString("fa-IR");
+
+}
+
+updateClock();
+
+setInterval(
+    updateClock,
+    1000
+);
+
+async function loadCounts(){
+
+    const response =
+        await fetch(
+            "/api/monitor/{{ line_id }}"
+        );
+
+    const data =
+        await response.json();
+
+    document.getElementById(
+        "aioCount"
+    ).innerText = data.aio;
+
+    document.getElementById(
+        "mntCount"
+    ).innerText = data.mnt;
+
+    document.getElementById(
+        "caseCount"
+    ).innerText = data.case;
+
+    document.getElementById(
+        "nbCount"
+    ).innerText = data.nb;
+
+}
+
+loadCounts();
+
+setInterval(
+    loadCounts,
+    5000
+);
+
+function beep(){
+
+    const audioContext =
+        new (
+            window.AudioContext ||
+            window.webkitAudioContext
+        )();
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    oscillator.type = "sine";
+
+    oscillator.frequency.value = 1000;
+
+    oscillator.connect(
+        audioContext.destination
+    );
+
+    oscillator.start();
+
+    setTimeout(() => {
+
+        oscillator.stop();
+
+    },150);
+
+}
+
+orderInput.addEventListener(
+    "keydown",
+    function(e){
+
+        if(e.key === "Enter"){
+
+            serialInput.focus();
+
+        }
+
+    }
+);
+
+serialInput.addEventListener(
+    "keydown",
+    async function(e){
+
+        if(e.key !== "Enter")
+            return;
+
+        const orderNumber =
+            orderInput.value.trim();
+
+        const serialNumber =
+            serialInput.value.trim();
+
+        const response =
+            await fetch("/api/serial",{
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":
+                    "application/json"
+                },
+
+                body:JSON.stringify({
+
+                    line_id:
+                        {{ line_id }},
+
+                    order_number:
+                        orderNumber,
+
+                    serial_number:
+                        serialNumber
+
+                })
+
+            });
+
+        const result =
+            await response.json();
+
+        if(result.message){
+
+            message.className =
+                "success";
+
+            message.innerText =
+                "✓ Saved Successfully";
+
+            document.getElementById(
+                "lastSerial"
+            ).innerText =
+                "Last Serial : "
+                +
+                serialNumber;
+
+            beep();
+
+            loadCounts();
+
+        }
+        else{
+
+            message.className =
+                "error";
+
+            message.innerText =
+                result.error;
+
+        }
+
+        orderInput.value = "";
+
+        serialInput.value = "";
+
+        orderInput.focus();
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>
