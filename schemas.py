@@ -25,3 +25,21 @@ class OrderCodeCreate(BaseModel):
     order_code: str
 
     product_type: str
+
+class UserCreate(BaseModel):
+
+    username: str
+
+    password: str
+
+    role: str
+
+    line_id: int | None = None
+
+class UserUpdate(
+    BaseModel
+):
+
+    role: str
+
+    line_id: int | None = None

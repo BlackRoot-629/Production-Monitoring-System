@@ -44,7 +44,7 @@ class Serial(Base):
 
     product_type = Column(String(20))
 
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now)
 
 class LineStop(Base):
 
@@ -56,7 +56,7 @@ class LineStop(Base):
 
     stop_minutes = Column(Integer)
 
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now)
 
 class SwitchLog(Base):
 
@@ -66,7 +66,7 @@ class SwitchLog(Base):
 
     line_id = Column(Integer, ForeignKey("lines.id"))
 
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now)
 
 class User(Base):
 
