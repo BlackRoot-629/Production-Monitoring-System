@@ -15,7 +15,7 @@ body{
 
     margin:0;
 
-    height:100vh;
+    min-height:100vh;
 
     display:flex;
 
@@ -28,6 +28,8 @@ body{
     font-family:Tahoma;
 
     color:white;
+
+    padding:20px;
 
 }
 
@@ -58,7 +60,16 @@ h1{
 
 }
 
-input,select{
+h2{
+
+    text-align:center;
+
+    margin-top:35px;
+
+}
+
+input,
+select{
 
     width:100%;
 
@@ -116,6 +127,33 @@ button{
 
 }
 
+table{
+
+    width:100%;
+
+    margin-top:20px;
+
+    border-collapse:collapse;
+
+}
+
+th,
+td{
+
+    border:1px solid #475569;
+
+    padding:12px;
+
+    text-align:center;
+
+}
+
+th{
+
+    background:#334155;
+
+}
+
 </style>
 
 </head>
@@ -138,27 +176,19 @@ button{
     <select id="productType">
 
         <option value="AIO">
-
             AIO
-
         </option>
 
         <option value="MNT">
-
             MNT
-
         </option>
 
         <option value="CASE">
-
             CASE
-
         </option>
 
         <option value="NB">
-
             NB
-
         </option>
 
     </select>
@@ -171,9 +201,82 @@ button{
 
     <div id="message"></div>
 
+    <h2>
+
+        Recent Order Codes
+
+    </h2>
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>
+                    Order Code
+                </th>
+
+                <th>
+                    Product Type
+                </th>
+
+            </tr>
+
+        </thead>
+
+        <tbody id="historyTable">
+
+        </tbody>
+
+    </table>
+
 </div>
 
 <script>
+
+async function loadHistory(){
+
+    const response =
+
+        await fetch(
+            "/api/ordercodes"
+        );
+
+    const data =
+        await response.json();
+
+    let html = "";
+
+    data.forEach(item=>{
+
+        html += `
+
+        <tr>
+
+            <td>
+
+                ${item.order_code}
+
+            </td>
+
+            <td>
+
+                ${item.product_type}
+
+            </td>
+
+        </tr>
+
+        `;
+
+    });
+
+    document.getElementById(
+        "historyTable"
+    ).innerHTML = html;
+
+}
 
 async function saveOrderCode(){
 
@@ -237,7 +340,10 @@ async function saveOrderCode(){
             "orderCode"
         ).value = "";
 
+        loadHistory();
+
     }
+
     else{
 
         message.className =
@@ -249,6 +355,8 @@ async function saveOrderCode(){
     }
 
 }
+
+loadHistory();
 
 </script>
 

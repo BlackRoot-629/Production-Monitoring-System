@@ -16,13 +16,19 @@ from services import calculate_expected_count
 from models import User
 from schemas import LoginRequest
 from schemas import OrderCodeCreate
+from schemas import UserCreate, UserUpdate
 
 from pydantic import BaseModel
+
+import jdatetime
+from fastapi.responses import FileResponse
+from export_all_excel import export_all_production
 
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
 
+from datetime import datetime
 
 from fastapi.templating import Jinja2Templates
 
@@ -127,7 +133,20 @@ def monitor(
     )
 
 @app.get("/api/monitor/{line_id}")
+
+
 def get_monitor(line_id: int):
+    today = datetime.now().replace(
+
+    hour=0,
+
+    minute=0,
+
+    second=0,
+
+    microsecond=0
+
+    )
 
     db = SessionLocal()
 
@@ -138,13 +157,15 @@ def get_monitor(line_id: int):
             0
         )
         ).filter(
-            LineStop.line_id == line_id
+            LineStop.line_id == line_id,
+            LineStop.created_at >= today
         ).scalar()
 
         switch_count = db.query(
             func.count()
         ).filter(
-            SwitchLog.line_id == line_id
+            SwitchLog.line_id == line_id,
+            SwitchLog.created_at >= today
         ).scalar()
 
         expected_count = calculate_expected_count(
@@ -156,26 +177,31 @@ def get_monitor(line_id: int):
 
         aio = db.query(func.count()).filter(
             Serial.line_id == line_id,
-            Serial.product_type == "AIO"
+            Serial.product_type == "AIO",
+            Serial.created_at >= today
         ).scalar()
 
         mnt = db.query(func.count()).filter(
             Serial.line_id == line_id,
-            Serial.product_type == "MNT"
+            Serial.product_type == "MNT",
+            Serial.created_at >= today
         ).scalar()
 
         case = db.query(func.count()).filter(
             Serial.line_id == line_id,
-            Serial.product_type == "CASE"
+            Serial.product_type == "CASE",
+            Serial.created_at >= today
         ).scalar()
 
         nb = db.query(func.count()).filter(
             Serial.line_id == line_id,
-            Serial.product_type == "NB"
+            Serial.product_type == "NB",
+            Serial.created_at >= today
         ).scalar()
 
         actual_count = db.query(func.count()).filter(
-            Serial.line_id == line_id
+            Serial.line_id == line_id,
+            Serial.created_at >= today
         ).scalar()
 
         aio_equivalent = (
@@ -190,7 +216,7 @@ def get_monitor(line_id: int):
 
         )
 
-        difference = actual_count - expected_count
+        difference = aio_equivalent - expected_count
 
         production_score = actual_count
         return {
@@ -252,13 +278,19 @@ def add_stop(data: StopCreate):
 
 @app.post("/api/switch/{line_id}")
 def use_switch(line_id: int):
-
+    today = datetime.now().replace(
+        hour=0,
+        minute=0,
+        second=0,
+        microsecond=0
+    )
     db = SessionLocal()
 
     try:
 
         count = db.query(func.count()).filter(
-            SwitchLog.line_id == line_id
+            SwitchLog.line_id == line_id,
+            SwitchLog.created_at >= today
         ).scalar()
 
         if count >= 2:
@@ -355,6 +387,17 @@ def dashboard(
 
 @app.get("/api/dashboard")
 def dashboard_data():
+    today = datetime.now().replace(
+
+    hour=0,
+
+    minute=0,
+
+    second=0,
+
+    microsecond=0
+
+    )
 
     db = SessionLocal()
 
@@ -367,27 +410,32 @@ def dashboard_data():
             actual_count = db.query(
                 func.count()
             ).filter(
-                Serial.line_id == line_id
+                Serial.line_id == line_id,
+                Serial.created_at >= today
             ).scalar()
 
             aio = db.query(func.count()).filter(
                 Serial.line_id == line_id,
-                Serial.product_type == "AIO"
+                Serial.product_type == "AIO",
+                Serial.created_at >= today
             ).scalar()
 
             mnt = db.query(func.count()).filter(
                 Serial.line_id == line_id,
-                Serial.product_type == "MNT"
+                Serial.product_type == "MNT",
+                Serial.created_at >= today
             ).scalar()
 
             case = db.query(func.count()).filter(
                 Serial.line_id == line_id,
-                Serial.product_type == "CASE"
+                Serial.product_type == "CASE",
+                Serial.created_at >= today
             ).scalar()
 
             nb = db.query(func.count()).filter(
                 Serial.line_id == line_id,
-                Serial.product_type == "NB"
+                Serial.product_type == "NB",
+                Serial.created_at >= today
             ).scalar()
 
             aio_equivalent = (
@@ -410,13 +458,15 @@ def dashboard_data():
                     0
                 )
             ).filter(
-                LineStop.line_id == line_id
+                LineStop.line_id == line_id,
+                LineStop.created_at >= today
             ).scalar()
 
             switch_count = db.query(
                 func.count()
             ).filter(
-                SwitchLog.line_id == line_id
+                SwitchLog.line_id == line_id,
+                SwitchLog.created_at >= today
             ).scalar()
 
             expected_count = calculate_expected_count(
@@ -505,6 +555,437 @@ def add_ordercode(data: OrderCodeCreate):
             "message":
             "Saved"
         }
+
+    finally:
+
+        db.close()
+
+@app.get("/supervisor/{line_id}")
+def supervisor_page(
+
+    request: Request,
+
+    line_id: int
+
+):
+
+    return templates.TemplateResponse(
+        request=request,
+        name="supervisor.html",
+        context={
+            "line_id": line_id
+        }
+    )
+
+@app.get("/stop/{line_id}")
+def stop_page(
+    request: Request,
+    line_id: int
+):
+
+    return templates.TemplateResponse(
+        request=request,
+        name="stop.html",
+        context={
+            "line_id": line_id
+        }
+    )
+
+@app.get("/api/stop/{line_id}")
+def get_stops(line_id: int):
+
+    db = SessionLocal()
+
+    try:
+
+        stops = db.query(
+            LineStop
+        ).filter(
+
+            LineStop.line_id == line_id
+
+        ).order_by(
+
+            LineStop.id.desc()
+
+        ).limit(10).all()
+
+        result = []
+
+        for stop in stops:
+
+            jalali_date = (
+                jdatetime.datetime.fromgregorian(
+                    datetime=stop.created_at
+                )
+            )
+
+            result.append({
+
+                "minutes":
+                stop.stop_minutes,
+
+                "time":
+                jalali_date.strftime(
+                    "%Y/%m/%d %H:%M"
+                )
+
+            })
+
+        return result
+
+    finally:
+
+        db.close()
+
+@app.get("/switch/{line_id}")
+def switch_page(
+    request: Request,
+    line_id: int
+):
+
+    return templates.TemplateResponse(
+        request=request,
+        name="switch.html",
+        context={
+            "line_id": line_id
+        }
+    )
+
+@app.get("/api/switch/{line_id}")
+def get_switches(line_id: int):
+
+    db = SessionLocal()
+
+    try:
+
+        switches = db.query(
+            SwitchLog
+        ).filter(
+
+            SwitchLog.line_id == line_id
+
+        ).order_by(
+
+            SwitchLog.id.desc()
+
+        ).limit(10).all()
+
+        result = []
+
+        for switch in switches:
+
+            jalali_date = (
+                jdatetime.datetime.fromgregorian(
+                    datetime=switch.created_at
+                )
+            )
+
+            result.append({
+
+                "time":
+                jalali_date.strftime(
+                    "%Y/%m/%d %H:%M"
+                )
+
+            })
+
+        return result
+
+    finally:
+
+        db.close()
+
+
+@app.get("/admin")
+def admin_page(request: Request):
+
+    return templates.TemplateResponse(
+        request=request,
+        name="admin.html",
+        context={
+            "request": request
+        }
+
+    )
+
+@app.get("/api/users")
+def get_users():
+
+    db = SessionLocal()
+
+    try:
+
+        users = db.query(User).all()
+
+        return [
+
+            {
+
+                "id":
+                user.id,
+
+                "username":
+                user.username,
+
+                "role":
+                user.role,
+
+                "line_id":
+                user.line_id
+
+            }
+
+            for user in users
+
+        ]
+
+    finally:
+
+        db.close()
+
+@app.post("/api/users")
+def create_user(
+    data: UserCreate
+):
+
+    db = SessionLocal()
+
+    try:
+
+        exists = db.query(
+            User
+        ).filter(
+
+            User.username ==
+            data.username
+
+        ).first()
+
+        if exists:
+
+            return {
+
+                "error":
+                "Username Exists"
+
+            }
+
+        user = User(
+
+            username=data.username,
+
+            password=data.password,
+
+            role=data.role,
+
+            line_id=data.line_id
+
+        )
+
+        db.add(user)
+
+        db.commit()
+
+        return {
+
+            "message":
+            "User Created"
+
+        }
+
+    finally:
+
+        db.close()
+
+@app.delete("/api/users/{user_id}")
+def delete_user(user_id: int):
+
+    db = SessionLocal()
+
+    try:
+
+        user = db.query(
+            User
+        ).filter(
+
+            User.id == user_id
+
+        ).first()
+
+        if not user:
+
+            return {
+
+                "error":
+                "User Not Found"
+
+            }
+
+        if user.role == "admin":
+
+            return {
+
+                "error":
+                "Cannot Delete Admin"
+
+            }
+
+        db.delete(user)
+
+        db.commit()
+
+        return {
+
+            "message":
+            "User Deleted"
+
+        }
+
+    finally:
+
+        db.close()
+
+@app.put("/api/users/{user_id}")
+def update_user(
+    user_id: int,
+    data: UserUpdate
+):
+
+    db = SessionLocal()
+
+    try:
+
+        user = db.query(
+            User
+        ).filter(
+
+            User.id == user_id
+
+        ).first()
+
+        if not user:
+
+            return {
+
+                "error":
+                "User Not Found"
+
+            }
+
+        if user.role == "admin":
+
+            return {
+
+                "error":
+                "Cannot Modify Admin"
+
+            }
+
+        user.role = data.role
+
+        user.line_id = data.line_id
+
+        db.commit()
+
+        return {
+
+            "message":
+            "User Updated"
+
+        }
+
+    finally:
+
+        db.close()
+
+
+@app.get("/admin/export")
+def admin_export(
+    request: Request
+):
+
+    return templates.TemplateResponse(
+        request=request,
+        name="admin_export.html",
+        context={
+            "request": request
+        }
+
+    )
+
+@app.get("/admin/users")
+def admin_users(
+    request: Request
+):
+
+    return templates.TemplateResponse(
+        request=request,
+        name="admin_users.html",
+        context={
+            "request": request
+        }
+    )
+
+@app.get("/admin/export")
+def export_page(request: Request):
+
+    return templates.TemplateResponse(
+        request=request,
+        name="admin_export.html",
+        context={
+            "request": request
+        }
+
+    )
+
+@app.get("/api/export")
+
+def export_excel():
+
+    file_path = export_all_production()
+
+    return FileResponse(
+
+        path=file_path,
+
+        filename="Production_Report.xlsx",
+
+        media_type=
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+    )
+
+@app.get("/api/ordercodes")
+def get_ordercodes():
+
+    db = SessionLocal()
+
+    try:
+
+        orders = db.query(
+            OrderCode
+        ).order_by(
+
+            OrderCode.id.desc()
+
+        ).limit(20).all()
+
+        return [
+
+            {
+
+                "order_code":
+                item.order_code,
+
+                "product_type":
+                item.product_type
+
+            }
+
+            for item in orders
+
+        ]
 
     finally:
 

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fa">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Supervisor Panel</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+body{
+
+    margin:0;
+
+    background:#0f172a;
+
+    font-family:Tahoma;
+
+    color:white;
+
+}
+
+.container{
+
+    width:90%;
+
+    max-width:900px;
+
+    margin:auto;
+
+    padding-top:40px;
+
+}
+
+.header{
+
+    text-align:center;
+
+    margin-bottom:40px;
+
+}
+
+.header h1{
+
+    font-size:50px;
+
+    margin:0;
+
+}
+
+.header h2{
+
+    font-size:28px;
+
+    color:#94a3b8;
+
+}
+
+.clock{
+
+    text-align:center;
+
+    font-size:24px;
+
+    margin-bottom:30px;
+
+}
+
+.grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(2,1fr);
+
+    gap:25px;
+
+}
+
+.card{
+
+    background:linear-gradient(
+        145deg,
+        #1e293b,
+        #0f172a
+    );
+
+    border-radius:25px;
+
+    padding:40px;
+
+    text-align:center;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    box-shadow:
+    0 8px 20px rgba(0,0,0,.5);
+
+}
+
+.card:hover{
+
+    transform:
+    translateY(-5px);
+
+}
+
+.icon{
+
+    font-size:60px;
+
+    margin-bottom:15px;
+
+}
+
+.title{
+
+    font-size:28px;
+
+    font-weight:bold;
+
+}
+
+.subtitle{
+
+    margin-top:10px;
+
+    color:#cbd5e1;
+
+    font-size:18px;
+
+}
+
+.footer{
+
+    text-align:center;
+
+    margin-top:40px;
+
+    color:#94a3b8;
+
+    font-size:18px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <h1>
+
+            Supervisor Panel
+
+        </h1>
+
+        <h2>
+
+            Line {{ line_id }}
+
+        </h2>
+
+    </div>
+
+    <div
+        class="clock"
+        id="clock"
+    >
+    </div>
+
+    <div class="grid">
+
+        <div
+            class="card"
+            onclick="
+            location.href=
+            '/line/{{ line_id }}'
+            "
+        >
+
+            <div class="icon">
+
+                📦
+
+            </div>
+
+            <div class="title">
+
+                Register Serial
+
+            </div>
+
+            <div class="subtitle">
+
+                Production Registration
+
+            </div>
+
+        </div>
+
+        <div
+            class="card"
+            onclick="
+            location.href=
+            '/monitor/{{ line_id }}'
+            "
+        >
+
+            <div class="icon">
+
+                📊
+
+            </div>
+
+            <div class="title">
+
+                Monitor
+
+            </div>
+
+            <div class="subtitle">
+
+                Live Statistics
+
+            </div>
+
+        </div>
+
+        <div
+            class="card"
+            onclick="
+            location.href=
+            '/stop/{{ line_id }}'
+            "
+        >
+
+            <div class="icon">
+
+                ⛔
+
+            </div>
+
+            <div class="title">
+
+                Stop
+
+            </div>
+
+            <div class="subtitle">
+
+                Register Line Stop
+
+            </div>
+
+        </div>
+
+        <div
+            class="card"
+            onclick="
+            location.href=
+            '/switch/{{ line_id }}'
+            "
+        >
+
+            <div class="icon">
+
+                🔄
+
+            </div>
+
+            <div class="title">
+
+                Switch
+
+            </div>
+
+            <div class="subtitle">
+
+                Register Model Change
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="footer">
+
+        Production Monitoring System
+
+    </div>
+
+</div>
+
+<script>
+
+function updateClock(){
+
+    const now = new Date();
+
+    document.getElementById(
+        "clock"
+    ).innerText =
+
+        now.toLocaleDateString("fa-IR")
+
+        +
+
+        " | "
+
+        +
+
+        now.toLocaleTimeString("fa-IR");
+
+}
+
+updateClock();
+
+setInterval(
+    updateClock,
+    1000
+);
+
+</script>
+
+</body>
+
+</html>
