@@ -177,36 +177,52 @@ async function login(){
     const result =
         await response.json();
 
-    if(result.error){
+    if(result.role === "admin"){
 
-        document.getElementById(
-            "message"
-        ).innerText =
-            result.error;
-
-        return;
+        window.location.href =
+            "/admin";
 
     }
 
-    if(result.role === "operator"){
+    else if(
+        result.role === "dashboard"
+    ){
 
         window.location.href =
-            "/line/" +
+            "/dashboard";
+
+    }
+
+    else if(
+        result.role === "ordercode"
+    ){
+
+        window.location.href =
+            "/ordercode";
+
+    }
+
+    else if(
+        result.role === "supervisor"
+    ){
+
+        window.location.href =
+
+            "/supervisor/" +
+
             result.line_id;
 
     }
 
-    if(result.role === "supervisor"){
+    else if(
+        result.role === "operator"
+    ){
 
         window.location.href =
-            "/monitor/1";
 
-    }
+            "/line/" +
 
-    if(result.role === "manager"){
-
-        window.location.href =
-            "/dashboard";
+            result.line_id;
 
     }
 
