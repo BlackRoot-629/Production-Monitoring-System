@@ -216,6 +216,19 @@ Order Codes must be registered before serial scanning. Otherwise the system will
 
 Order Code Not Found
 
+## V1.1 Release
+Features:
+- Role Based Authentication
+- Admin Panel
+- User Management
+- Supervisor Panel
+- Production Dashboard
+- Order Code Management
+- Stop & Switch Tracking
+- Excel Export
+- Daily Backup
+
+
 ## Author
 
 BlackRoot
