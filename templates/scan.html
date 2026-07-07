@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="fa">
 
 <head>
@@ -14,40 +13,21 @@
 
 body{
 
-    margin:0;
-
-    height:100vh;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
     background:#0f172a;
+
+    color:white;
 
     font-family:Tahoma;
 
-    color:white;
+    margin:20px;
 
 }
 
 .container{
 
-    width:700px;
+    max-width:900px;
 
-    background:linear-gradient(
-        145deg,
-        #2c2c2c,
-        #1a1a1a
-    );
-
-    padding:40px;
-
-    border-radius:30px;
-
-    box-shadow:
-        0 15px 30px rgba(0,0,0,.6);
+    margin:auto;
 
 }
 
@@ -55,7 +35,7 @@ h1{
 
     text-align:center;
 
-    font-size:42px;
+    font-size:40px;
 
     margin-bottom:15px;
 
@@ -67,9 +47,9 @@ h1{
 
     font-size:22px;
 
-    margin-bottom:15px;
-
     color:#cbd5e1;
+
+    margin-bottom:10px;
 
 }
 
@@ -79,9 +59,21 @@ h1{
 
     font-size:22px;
 
+    color:#38bdf8;
+
     margin-bottom:20px;
 
-    color:#38bdf8;
+}
+
+.card{
+
+    background:#1e293b;
+
+    border-radius:20px;
+
+    padding:20px;
+
+    margin-bottom:20px;
 
 }
 
@@ -91,7 +83,7 @@ h1{
 
     gap:10px;
 
-    margin-bottom:25px;
+    margin-bottom:20px;
 
 }
 
@@ -113,8 +105,6 @@ h1{
 
     font-size:18px;
 
-    margin-bottom:10px;
-
 }
 
 .statValue{
@@ -122,6 +112,8 @@ h1{
     font-size:30px;
 
     font-weight:bold;
+
+    margin-top:10px;
 
 }
 
@@ -141,26 +133,31 @@ input{
 
     box-sizing:border-box;
 
-    padding:20px;
+    padding:15px;
 
-    margin-bottom:25px;
+    font-size:24px;
 
     border:none;
 
-    border-radius:15px;
+    border-radius:10px;
 
-    font-size:28px;
-
-    outline:none;
-
-    background:#f8fafc;
+    margin-bottom:20px;
 
 }
 
-input:focus{
+button{
 
-    box-shadow:
-        0 0 15px #2563eb;
+    width:100%;
+
+    padding:15px;
+
+    font-size:24px;
+
+    border:none;
+
+    border-radius:10px;
+
+    cursor:pointer;
 
 }
 
@@ -168,13 +165,11 @@ input:focus{
 
     text-align:center;
 
-    font-size:30px;
+    font-size:24px;
 
-    font-weight:bold;
+    margin-top:15px;
 
-    min-height:50px;
-
-    margin-top:20px;
+    min-height:35px;
 
 }
 
@@ -190,6 +185,31 @@ input:focus{
 
 }
 
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+th,
+td{
+
+    padding:12px;
+
+    text-align:center;
+
+    border-bottom:1px solid #334155;
+
+}
+
+th{
+
+    background:#334155;
+
+}
+
 </style>
 
 </head>
@@ -200,7 +220,7 @@ input:focus{
 
 <h1>
 
-    Production Line {{ line_id }}
+Production Line {{ line_id }}
 
 </h1>
 
@@ -208,142 +228,283 @@ input:focus{
 
 <div id="lastSerial">
 
-    Last Serial : -
+Last Serial : -
 
 </div>
 
+<div class="card">
+
 <div class="stats">
 
-    <div class="statBox">
+<div class="statBox">
 
-        <div class="statTitle">AIO</div>
+<div class="statTitle">
 
-        <div class="statValue" id="aioCount">0</div>
+AIO
 
-    </div>
+</div>
 
-    <div class="statBox">
+<div
+class="statValue"
+id="aioCount">
 
-        <div class="statTitle">MNT</div>
+0
 
-        <div class="statValue" id="mntCount">0</div>
+</div>
 
-    </div>
+</div>
 
-    <div class="statBox">
+<div class="statBox">
 
-        <div class="statTitle">CASE</div>
+<div class="statTitle">
 
-        <div class="statValue" id="caseCount">0</div>
+MNT
 
-    </div>
+</div>
 
-    <div class="statBox">
+<div
+class="statValue"
+id="mntCount">
 
-        <div class="statTitle">NB</div>
+0
 
-        <div class="statValue" id="nbCount">0</div>
+</div>
 
-    </div>
+</div>
+
+<div class="statBox">
+
+<div class="statTitle">
+
+CASE
+
+</div>
+
+<div
+class="statValue"
+id="caseCount">
+
+0
+
+</div>
+
+</div>
+
+<div class="statBox">
+
+<div class="statTitle">
+
+NB
+
+</div>
+
+<div
+class="statValue"
+id="nbCount">
+
+0
+
+</div>
+
+</div>
 
 </div>
 
 <label>
 
-    Order Number
+Order Number
 
 </label>
 
 <input
-    id="orderNumber"
-    placeholder="Scan Order Number"
-    autofocus
+id="orderNumber"
+placeholder="Scan Order Number"
+autofocus
 >
 
 <label>
 
-    Serial Number
+Serial Number
 
 </label>
 
 <input
-    id="serialNumber"
-    placeholder="Scan Serial Number"
+id="serialNumber"
+placeholder="Scan Serial Number"
 >
 
 <div id="message"></div>
 
+</div>
+
+<div class="card">
+
+<h2>
+
+Last 20 Serials
+
+</h2>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>
+
+Time
+
+</th>
+
+<th>
+
+Order
+
+</th>
+
+<th>
+
+Serial
+
+</th>
+
+</tr>
+
+</thead>
+
+<tbody id="serialHistory">
+
+</tbody>
+
+</table>
+
+</div>
 
 </div>
 
 <script>
 
 const orderInput =
-    document.getElementById("orderNumber");
+document.getElementById("orderNumber");
 
 const serialInput =
-    document.getElementById("serialNumber");
+document.getElementById("serialNumber");
 
 const message =
-    document.getElementById("message");
+document.getElementById("message");
 
 function updateClock(){
 
-    const now = new Date();
+const now =
+new Date();
 
-    document.getElementById(
-        "clock"
-    ).innerText =
+document.getElementById(
+"clock"
+).innerText =
 
-        now.toLocaleDateString("fa-IR")
-        +
-        " | "
-        +
-        now.toLocaleTimeString("fa-IR");
+now.toLocaleDateString("fa-IR")
+
++
+
+" | "
+
++
+
+now.toLocaleTimeString("fa-IR");
 
 }
 
 updateClock();
 
 setInterval(
-    updateClock,
-    1000
+updateClock,
+1000
 );
 
 async function loadCounts(){
 
+const response =
+await fetch(
+"/api/monitor/{{ line_id }}"
+);
+
+const data =
+await response.json();
+
+document.getElementById(
+"aioCount"
+).innerText =
+data.aio;
+
+document.getElementById(
+"mntCount"
+).innerText =
+data.mnt;
+
+document.getElementById(
+"caseCount"
+).innerText =
+data.case;
+
+document.getElementById(
+"nbCount"
+).innerText =
+data.nb;
+
+}
+
+async function loadSerialHistory(){
+
     const response =
         await fetch(
-            "/api/monitor/{{ line_id }}"
+            "/api/serials/{{ line_id }}"
         );
 
     const data =
         await response.json();
 
-    document.getElementById(
-        "aioCount"
-    ).innerText = data.aio;
+    let html = "";
+
+    data.forEach(item=>{
+
+        html += `
+
+        <tr>
+
+            <td>
+
+                ${item.time}
+
+            </td>
+
+            <td>
+
+                ${item.order}
+
+            </td>
+
+            <td>
+
+                ${item.serial}
+
+            </td>
+
+        </tr>
+
+        `;
+
+    });
 
     document.getElementById(
-        "mntCount"
-    ).innerText = data.mnt;
-
-    document.getElementById(
-        "caseCount"
-    ).innerText = data.case;
-
-    document.getElementById(
-        "nbCount"
-    ).innerText = data.nb;
+        "serialHistory"
+    ).innerHTML = html;
 
 }
 
 loadCounts();
 
-setInterval(
-    loadCounts,
-    5000
-);
+loadSerialHistory();
 
 function beep(){
 
@@ -366,7 +527,7 @@ function beep(){
 
     oscillator.start();
 
-    setTimeout(() => {
+    setTimeout(()=>{
 
         oscillator.stop();
 
@@ -378,7 +539,7 @@ orderInput.addEventListener(
     "keydown",
     function(e){
 
-        if(e.key === "Enter"){
+        if(e.key==="Enter"){
 
             serialInput.focus();
 
@@ -391,7 +552,7 @@ serialInput.addEventListener(
     "keydown",
     async function(e){
 
-        if(e.key !== "Enter")
+        if(e.key!=="Enter")
             return;
 
         const orderNumber =
@@ -401,29 +562,32 @@ serialInput.addEventListener(
             serialInput.value.trim();
 
         const response =
-            await fetch("/api/serial",{
+            await fetch(
+                "/api/serial",
+                {
 
-                method:"POST",
+                    method:"POST",
 
-                headers:{
-                    "Content-Type":
-                    "application/json"
-                },
+                    headers:{
+                        "Content-Type":
+                        "application/json"
+                    },
 
-                body:JSON.stringify({
+                    body:JSON.stringify({
 
-                    line_id:
-                        {{ line_id }},
+                        line_id:
+                            {{ line_id }},
 
-                    order_number:
-                        orderNumber,
+                        order_number:
+                            orderNumber,
 
-                    serial_number:
-                        serialNumber
+                        serial_number:
+                            serialNumber
 
-                })
+                    })
 
-            });
+                }
+            );
 
         const result =
             await response.json();
@@ -439,13 +603,14 @@ serialInput.addEventListener(
             document.getElementById(
                 "lastSerial"
             ).innerText =
-                "Last Serial : "
-                +
+                "Last Serial : " +
                 serialNumber;
 
             beep();
 
             loadCounts();
+
+            loadSerialHistory();
 
         }
         else{
@@ -472,3 +637,4 @@ serialInput.addEventListener(
 </body>
 
 </html>
+

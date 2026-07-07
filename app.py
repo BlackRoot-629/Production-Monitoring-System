@@ -7,7 +7,7 @@ from database import SessionLocal
 from models import Serial, OrderCode
 from schemas import SerialCreate
 
-from sqlalchemy import func
+from sqlalchemy import func, or_
 
 from schemas import StopCreate
 from models import LineStop
@@ -17,16 +17,19 @@ from models import User
 from schemas import LoginRequest
 from schemas import OrderCodeCreate
 from schemas import UserCreate, UserUpdate
+from schemas import SerialUpdate
 
 from pydantic import BaseModel
 
 import jdatetime
 from fastapi.responses import FileResponse
 from export_all_excel import export_all_production
+from export_excel import export_production
 
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
+from fastapi import Query
 
 from datetime import datetime
 
@@ -117,7 +120,77 @@ def create_serial(data: SerialCreate):
     finally:
 
         db.close()
+def update_serial(
+    serial_id:int,
+    data:SerialUpdate
+):
 
+    db=SessionLocal()
+
+    try:
+
+        serial=db.query(Serial).filter(
+            Serial.id==serial_id
+        ).first()
+
+        if not serial:
+
+            return {"error":"Not Found"}
+
+        serial.order_number=data.order_number
+
+        serial.serial_number=data.serial_number
+
+        db.commit()
+
+        return {"message":"Updated"}
+
+    finally:
+
+        db.close()
+def get_serial(serial_id:int):
+
+    db = SessionLocal()
+
+    try:
+
+        serial = (
+
+            db.query(Serial)
+
+            .filter(
+                Serial.id == serial_id
+            )
+
+            .first()
+
+        )
+
+        if not serial:
+
+            return {
+
+                "error":"Serial Not Found"
+
+            }
+
+        return {
+
+            "id":serial.id,
+
+            "order_number":serial.order_number,
+
+            "serial_number":serial.serial_number,
+
+            "line_id":serial.line_id,
+
+            "time":serial.created_at.strftime("%Y/%m/%d %H:%M")
+
+        }
+
+    finally:
+
+        db.close()
 @app.get("/monitor/{line_id}")
 def monitor(
     request: Request,
@@ -986,6 +1059,232 @@ def get_ordercodes():
             for item in orders
 
         ]
+
+    finally:
+
+        db.close()
+
+
+@app.get("/serial-history/{line_id}")
+def serial_history(
+    request: Request,
+    line_id: int
+):
+
+    return templates.TemplateResponse(
+        request=request,
+        name="serial_history.html",
+        context={
+            "line_id": line_id
+        }
+    )
+
+@app.get("/api/serial-history/{line_id}")
+def serial_history_api(line_id:int, search: str=""):
+
+    db=SessionLocal()
+
+    try:
+
+        query = (
+
+            db.query(Serial)
+
+            .filter(
+
+                Serial.line_id == line_id
+
+            )
+
+        )
+
+        if search:
+
+            query = query.filter(
+
+                or_(
+
+                    Serial.order_number.contains(search),
+
+                    Serial.serial_number.contains(search)
+
+                )
+
+            )
+
+        serials = (
+
+            query
+
+            .order_by(
+
+                Serial.id.desc()
+
+            )
+
+            .all()
+
+        )
+
+        result=[]
+
+        for item in serials:
+
+            result.append({
+
+                "id":item.id,
+
+                "time":item.created_at.strftime("%Y/%m/%d %H:%M"),
+
+                "order":item.order_number,
+
+                "serial":item.serial_number
+
+            })
+
+        return result
+
+    finally:
+
+        db.close()
+
+@app.get("/edit-serial/{serial_id}")
+def edit_serial_page(
+
+    request: Request,
+
+    serial_id: int
+
+):
+
+    return templates.TemplateResponse(
+        request=request,
+        name="edit_serial.html",
+        context={
+            "request": request,
+            "serial_id": serial_id
+        }
+    )
+
+
+@app.put("/api/serial/{serial_id}")
+def update_serial(
+    serial_id:int,
+    data:SerialUpdate
+):
+
+    db=SessionLocal()
+
+    try:
+
+        serial=db.query(Serial).filter(
+            Serial.id==serial_id
+        ).first()
+
+        if not serial:
+
+            return {"error":"Not Found"}
+
+        serial.order_number=data.order_number
+
+        serial.serial_number=data.serial_number
+
+        db.commit()
+
+        return {"message":"Updated"}
+
+    finally:
+
+        db.close()
+
+@app.get("/api/serial/{serial_id}")
+def get_serial(serial_id:int):
+
+    db = SessionLocal()
+
+    try:
+
+        serial = (
+
+            db.query(Serial)
+
+            .filter(
+                Serial.id == serial_id
+            )
+
+            .first()
+
+        )
+
+        if not serial:
+
+            return {
+
+                "error":"Serial Not Found"
+
+            }
+
+        return {
+
+            "id":serial.id,
+
+            "order_number":serial.order_number,
+
+            "serial_number":serial.serial_number,
+
+            "line_id":serial.line_id,
+
+            "time":serial.created_at.strftime("%Y/%m/%d %H:%M")
+
+        }
+
+    finally:
+
+        db.close()
+
+@app.get("/api/export/today")
+def export_today():
+
+    file_path = export_production()
+    return FileResponse(
+        path=file_path,
+
+        filename="Production_today_report.xlsx",
+
+        media_type=
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+     )
+
+@app.get("/api/serials/{line_id}")
+def serial_history(line_id: int):
+
+    db = SessionLocal()
+
+    try:
+
+        serials = (
+            db.query(Serial)
+            .filter(Serial.line_id == line_id)
+            .order_by(Serial.id.desc())
+            .limit(20)
+            .all()
+        )
+
+        result = []
+
+        for item in serials:
+
+            result.append({
+
+                "time": item.created_at.strftime("%H:%M:%S"),
+
+                "order": item.order_number,
+
+                "serial": item.serial_number
+
+            })
+
+        return result
 
     finally:
 
