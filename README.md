@@ -227,7 +227,10 @@ Features:
 - Stop & Switch Tracking
 - Excel Export
 - Daily Backup
-
+## V1.2 Release
+Features:
+- Show History Of Added Serial
+- Add Edit Serial & order number in supervisor page
 
 ## Author
 
